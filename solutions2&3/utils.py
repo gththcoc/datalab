@@ -3,6 +3,7 @@ import os
 import sys
 import subprocess
 import uuid
+import numpy as np
 
 exe_dir = "../code" # directory where the executable is found
 output_dir = "../code/data_lab2" # directory to save the data file
@@ -51,8 +52,8 @@ def generate_source(
     out, err = process.communicate()
     if err:
         print('The process raised an error:', err.decode())
-    if out:
-        print('The process has an output:', out.decode())
+    #if out:
+    #    print('The process has an output:', out.decode())
 
     return os.path.join(output_dir, outputFile)
 
@@ -73,7 +74,6 @@ def prober(inputFile, f=0, outputFile=None, phi=0, templateFile=None, mod=1):
     """
     
     inputFile = os.path.basename(inputFile)
-    
     if outputFile == None:
         outputFile = "results_" + str(uuid.uuid4()) + ".csv"
     
@@ -86,24 +86,28 @@ def prober(inputFile, f=0, outputFile=None, phi=0, templateFile=None, mod=1):
         f"-o {output_dir}/{outputFile} -m {mod}"
     #print(cmd_str)
     if templateFile:
-        cmd_str += f" -t {output_dir}/{templateFile} "
+        cmd_str += f" -t {templateFile} "
     else:
         cmd_str += f" -f {f} -p {phi}"
     
     # Optionally print the command line and test it outside the notebook
-    # print(cmd_str)
+    #print(cmd_str)
     
     cmd = cmd_str.split(' ')
     process = subprocess.Popen(cmd,stdout=subprocess.PIPE)
     out, err = process.communicate()
-    if err:
-        print('The process raised an error:', err.decode())
-    if out:
+    #if err:
+    #    print('The process raised an error:', err.decode())
+    #if out:
         #print('The process has an output:', out.decode())
-        return out.decode().split(' ')
-    if os.path.isfile(outputFile):
-        print(f"Output generated in file {outputFile}")
+        #return (out.decode().split('\n')[0]).split(' ')
+    #if os.path.isfile(outputFile):
+    #    print(f"Output generated in file {outputFile}")
 
-    return os.path.join(output_dir, outputFile)
+    if templateFile is None:
+        return os.path.join(output_dir, outputFile), np.float_((out.decode().split('\n')[0]).split(' '))
+    else:
+        return os.path.join(output_dir, outputFile)
+        
     
 
